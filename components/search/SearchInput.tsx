@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 
 interface SearchInputProps {
 	searchQuery: string;
@@ -16,12 +17,23 @@ export function SearchInput({
 	onKeyPress,
 	onFirstType,
 }: SearchInputProps) {
+	const inputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			inputRef.current?.focus();
+		}, 100);
+
+		return () => clearTimeout(timer);
+	}, []);
+
 	return (
 		<motion.div
 			className="relative"
 			whileHover={{ scale: 1.02 }}
 			transition={{ duration: 0.2 }}>
 			<motion.input
+				ref={inputRef}
 				type="text"
 				value={searchQuery}
 				onChange={(e) => {

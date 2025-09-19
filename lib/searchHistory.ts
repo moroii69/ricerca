@@ -53,7 +53,6 @@ export async function saveSearchToHistory(
 	const newItem: SearchHistoryItem = { query, engine, timestamp: Date.now() };
 	store.put(newItem);
 
-	// Trim to MAX_HISTORY_ITEMS by deleting oldest beyond limit
 	const index = store.index("timestamp_idx");
 	const items: SearchHistoryItem[] = [];
 	await new Promise<void>((resolve) => {

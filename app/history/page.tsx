@@ -131,9 +131,24 @@ export default function HistoryPage() {
 															{item.engine}
 														</td>
 														<td className="py-2 px-3 text-sm text-[rgba(55,50,47,0.60)] font-sans">
-															{new Date(
-																item.timestamp
-															).toLocaleString()}
+															{(() => {
+																const date = new Date(item.timestamp);
+																const day = date.getDate();
+																const month = date.toLocaleString('en-US', { month: 'long' });
+																const year = date.getFullYear();
+
+																const getOrdinalSuffix = (day: number) => {
+																	if (day >= 11 && day <= 13) return 'th';
+																	switch (day % 10) {
+																		case 1: return 'st';
+																		case 2: return 'nd';
+																		case 3: return 'rd';
+																		default: return 'th';
+																	}
+																};
+
+																return `${day}${getOrdinalSuffix(day)} ${month}, ${year}`;
+															})()}
 														</td>
 														<td className="py-2 px-3">
 															<button
@@ -143,7 +158,7 @@ export default function HistoryPage() {
 																	)
 																}
 																className="text-xs px-2 py-1 bg-white border border-[rgba(55,50,47,0.12)] rounded text-[#37322F] hover:shadow-[0px_1px_2px_rgba(55,50,47,0.12)] transition-shadow duration-200 cursor-pointer">
-																Copy
+																Copy Query
 															</button>
 														</td>
 													</tr>

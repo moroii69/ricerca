@@ -11,7 +11,6 @@ const searchEngines = [
 
 const additionalSearchEngines = [
 	{ name: "Qwen", color: "bg-[#FF6347]" },
-	{ name: "Alibaba Cloud", color: "bg-[#FFA500]" },
 ];
 
 export function FeatureSection() {
@@ -57,8 +56,8 @@ export function FeatureSection() {
 			<div className="w-full border-b border-[rgba(55,50,47,0.12)] flex flex-col items-center">
 				<div className="w-full max-w-4xl px-6 md:px-12 lg:px-24 py-12 md:py-20 flex flex-col items-center text-center gap-6">
 					{/* Headline */}
-					<h1 className="text-[#49423D] text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold leading-tight md:leading-[56px] tracking-tight font-sans">
-						search smarter, not harder
+					<h1 className="font-instrument-serif  text-[#49423D] text-2xl sm:text-3xl md:text-4xl lg:text-5xl  leading-tight md:leading-[56px] tracking-tight font-sans">
+						search <span className="font-normal italic">smarter</span>, not harder
 					</h1>
 
 					{/* Subtext */}

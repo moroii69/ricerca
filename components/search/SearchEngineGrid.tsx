@@ -7,6 +7,8 @@ interface SearchEngineGridProps {
 	onSearch: (url: string, name: string) => void;
 	showMore: boolean;
 	onShowMore: () => void;
+	defaultEngine: SearchEngine;
+	onSetDefault: (engineName: string) => void;
 }
 
 export function SearchEngineGrid({
@@ -14,6 +16,8 @@ export function SearchEngineGrid({
 	onSearch,
 	showMore,
 	onShowMore,
+	defaultEngine,
+	onSetDefault,
 }: SearchEngineGridProps) {
 	return (
 		<motion.div
@@ -21,6 +25,15 @@ export function SearchEngineGrid({
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			transition={{ duration: 0.3 }}>
+			<motion.div
+				className="text-center text-[rgba(55,50,47,0.60)] text-sm font-medium mb-2"
+				initial={{ opacity: 0, y: -10 }}
+				animate={{ opacity: 1, y: 0 }}
+				transition={{ duration: 0.3, delay: 0.1 }}>
+				Default search engine: <span className="font-semibold text-[#37322F]">{defaultEngine.name}</span>
+				<br />
+				<span className="text-xs text-[rgba(55,50,47,0.50)]">Right-click any engine to set as default</span>
+			</motion.div>
 			<div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
 				{engines.map((engine, index) => (
 					<motion.div
@@ -31,7 +44,15 @@ export function SearchEngineGrid({
 						transition={{ duration: 0.3, delay: index * 0.05 }}>
 						<motion.button
 							onClick={() => onSearch(engine.url, engine.name)}
-							className="h-10 sm:h-11 px-4 sm:px-6 py-2 bg-white border border-[rgba(55,50,47,0.12)] hover:border-[rgba(55,50,47,0.24)] rounded-full flex items-center justify-center gap-2 transition-all duration-200 group"
+							onContextMenu={(e) => {
+								e.preventDefault();
+								onSetDefault(engine.name);
+							}}
+							className={`h-10 sm:h-11 px-4 sm:px-6 py-2 bg-white border rounded-full flex items-center justify-center gap-2 transition-all duration-200 group relative ${
+								engine.name === defaultEngine.name
+									? "border-[#37322F] ring-1 ring-[#37322F]"
+									: "border-[rgba(55,50,47,0.12)] hover:border-[rgba(55,50,47,0.24)]"
+							}`}
 							whileHover={{
 								scale: 1.05,
 								boxShadow: "0px_2px_8px_rgba(55,50,47,0.12)",
@@ -45,6 +66,28 @@ export function SearchEngineGrid({
 							<span className="text-[#37322F] text-sm font-medium group-hover:text-[#2F3037]">
 								{engine.name}
 							</span>
+							{engine.name === defaultEngine.name && (
+								<motion.div
+									className="absolute -top-1 -right-1 w-3 h-3 bg-[#37322F] rounded-full flex items-center justify-center"
+									initial={{ scale: 0 }}
+									animate={{ scale: 1 }}
+									transition={{ duration: 0.2 }}>
+									<svg
+										width="8"
+										height="8"
+										viewBox="0 0 8 8"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg">
+										<path
+											d="M6.5 2.5L3.5 5.5L1.5 3.5"
+											stroke="white"
+											strokeWidth="1"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
+									</svg>
+								</motion.div>
+							)}
 						</motion.button>
 						<motion.div
 							className="text-center text-[rgba(55,50,47,0.50)] text-xs font-mono flex items-center justify-center gap-1"

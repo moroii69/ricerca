@@ -7,10 +7,14 @@ import { SearchInput } from "./SearchInput";
 import { SearchEngineGrid } from "./SearchEngineGrid";
 import { searchEngines, additionalSearchEngines } from "@/lib/searchEngines";
 import { saveSearchToHistory } from "@/lib/searchHistory";
+import { getDefaultSearchEngine, setDefaultSearchEngine } from "@/lib/defaultSearchEngine";
 
 export function SearchContainer() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [showMore, setShowMore] = useState(false);
+	const [showStartMessage, setShowStartMessage] = useState(true);
+	const [defaultEngine, setDefaultEngine] = useState(getDefaultSearchEngine());
+	const [hasScrolled, setHasScrolled] = useState(false);
 	const containerRef = useRef<HTMLDivElement | null>(null);
 
 	const handleSearch = (engineUrl: string, engineName: string) => {
@@ -24,7 +28,7 @@ export function SearchContainer() {
 
 	const handleKeyPress = (e: React.KeyboardEvent) => {
 		if (e.key === "Enter" && searchQuery.trim()) {
-			handleSearch(searchEngines[0].url, searchEngines[0].name);
+			handleSearch(defaultEngine.url, defaultEngine.name);
 		} else if (e.metaKey || e.ctrlKey) {
 			const num = Number.parseInt(e.key);
 			if (num >= 1 && num <= 6) {
@@ -49,6 +53,14 @@ export function SearchContainer() {
 		}
 	};
 
+	const handleSetDefault = (engineName: string) => {
+		setDefaultSearchEngine(engineName);
+		const engine = [...searchEngines, ...additionalSearchEngines].find(e => e.name === engineName);
+		if (engine) {
+			setDefaultEngine(engine);
+		}
+	};
+
 	const allEngines = showMore
 		? [...searchEngines, ...additionalSearchEngines]
 		: searchEngines;
@@ -61,17 +73,38 @@ export function SearchContainer() {
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.6, delay: 0.8 }}>
 			<div className="w-full flex flex-col gap-4">
+				<AnimatePresence>
+					{showStartMessage && !searchQuery.trim() && (
+						<motion.div
+							initial={{ opacity: 0, y: -10 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -10 }}
+							transition={{ duration: 0.3 }}
+							className="text-center text-[rgba(0, 0, 0, 0.4)] text-xs sm:text-sm font-instrument-serif mb-2">
+							start typing to search
+						</motion.div>
+					)}
+				</AnimatePresence>
 				<SearchInput
 					searchQuery={searchQuery}
-					setSearchQuery={setSearchQuery}
+					setSearchQuery={(query) => {
+						setSearchQuery(query);
+						if (query.trim() && showStartMessage) {
+							setShowStartMessage(false);
+						}
+					}}
 					onKeyPress={handleKeyPress}
 					onFirstType={() => {
-						containerRef.current?.scrollIntoView({
-							behavior: "smooth",
-							block: "start",
-						});
-						// Nudge slightly more to ensure full visibility below sticky/absolute elements
-						window.scrollBy({ top: 80, behavior: "smooth" });
+						if (!hasScrolled) {
+							setHasScrolled(true);
+							setTimeout(() => {
+								containerRef.current?.scrollIntoView({
+									behavior: "smooth",
+									block: "center",
+								});
+								window.scrollBy({ top: 60, behavior: "smooth" });
+							}, 100);
+						}
 					}}
 				/>
 
@@ -87,6 +120,8 @@ export function SearchContainer() {
 								onSearch={handleSearch}
 								showMore={showMore}
 								onShowMore={() => setShowMore(true)}
+								defaultEngine={defaultEngine}
+								onSetDefault={handleSetDefault}
 							/>
 						</motion.div>
 					)}
